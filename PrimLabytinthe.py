@@ -1,6 +1,9 @@
 from collections import deque
 import random
-import matplotlib.pyplot as plt
+try:
+   import matplotlib.pyplot as plt
+except Exception:
+   plt = None
 import time
 
 class PrimLabyrinthe:
@@ -69,6 +72,12 @@ class PrimLabyrinthe:
 
   #visualisation du labyrinthe avec matplotlib
   def _afficher(self, grille=None, title=None, chemin=None):
+     if plt is None:
+          print("Matplotlib non disponible - affichage désactivé.")
+          if chemin:
+               longueur_aretes = len(chemin) - 1
+               print(f"[Sans affichage] Chemin trouvé (L={longueur_aretes})")
+          return
      plt.figure(figsize=(6,6))
      data = self.grille if grille is None else grille
      plt.imshow(data, cmap='binary', interpolation='nearest')
