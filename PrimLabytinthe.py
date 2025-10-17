@@ -1,6 +1,7 @@
 from collections import deque
 import random
 import matplotlib.pyplot as plt
+import time
 
 class PrimLabyrinthe:
   def __init__(self, taille): #le cstr qui s'execute automatiquement quand on crée un objet de cette classe
@@ -92,15 +93,19 @@ class PrimLabyrinthe:
   
   def bfs(self, depart, arrivee):
         """
-        Retourne la liste de cases [(x,y), ...] entre depart et arrivee via BFS,
-        ou None si pas de chemin.
+        BFS (largeur) depuis 'depart' vers 'arrivee'.
+        Retourne (chemin, nb_explores) où:
+          - chemin est la liste [(x,y), ...] ou None si pas de chemin
+          - nb_explores est le nombre de nœuds dépilés (explorés)
         """
         queue   = deque([depart])
         visited = {depart}
         parent  = {}
+        explores = 0
 
         while queue:
             x, y = queue.popleft()
+            explores += 1
             if (x, y) == arrivee:
                 # reconstruction du chemin
                 chemin = []
@@ -109,7 +114,7 @@ class PrimLabyrinthe:
                     chemin.append(cur)
                     cur = parent[cur]
                 chemin.append(depart)
-                return list(reversed(chemin))
+                return list(reversed(chemin)), explores
 
             for nx, ny in self._voisin(x, y):
                 if self.grille[nx][ny] == 0 and (nx, ny) not in visited:
@@ -117,7 +122,7 @@ class PrimLabyrinthe:
                     parent[(nx, ny)] = (x, y)
                     queue.append((nx, ny))
 
-        return None  # aucun chemin trouvé
+        return None, explores  # aucun chemin trouvé
 
 
 if __name__ == "__main__":
@@ -129,12 +134,20 @@ if __name__ == "__main__":
    laby = PrimLabyrinthe(taille)
    grille = laby._generer()
 
-   # Labyrinthe parfait: il existe toujours un chemin unique entre deux cellules
-   chemin = laby.bfs(start, end)
+   # Mesure du temps et des nœuds explorés
+   t0 = time.perf_counter()
+   chemin, explores = laby.bfs(start, end)
+   t1 = time.perf_counter()
+   duree_ms = (t1 - t0) * 1000.0
 
    if chemin is None:
         print("Aucun chemin trouvé (cas anormal).")
+        print(f"Nœuds explorés: {explores}")
+        print(f"Temps: {duree_ms:.2f} ms")
         laby._afficher(title="Labyrinthe (aucun chemin trouvé)")
    else:
-        print("Chemin BFS :", chemin)
-        laby._afficher(title="Labyrinthe parfait (Prim) + Chemin BFS", chemin=chemin)
+        longueur_aretes = len(chemin) - 1
+        print(f"Chemin BFS (longueur en arêtes={longueur_aretes}): {chemin}")
+        print(f"Nœuds explorés: {explores}")
+        print(f"Temps: {duree_ms:.2f} ms")
+        laby._afficher(title=f"Labyrinthe parfait (Prim) + Chemin BFS (L={longueur_aretes})", chemin=chemin)
