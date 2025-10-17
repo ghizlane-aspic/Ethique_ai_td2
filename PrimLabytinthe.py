@@ -126,7 +126,7 @@ class PrimLabyrinthe:
 
 
 if __name__ == "__main__":
-   taille=21  # idéalement impair pour une meilleure symétrie
+   taille=31  # idéalement impair pour une meilleure symétrie
    # Dans cette représentation, les cellules (chemins) sont aux coordonnées impaires
    start = (1, 1)
    end   = (taille-2, taille-2)
